@@ -4,19 +4,19 @@
 
 echo "Downloading plugins"
 
-DIRECTORY=bundle
+DIRECTORY=~/.vim/bundle
 
 if [ -d "$DIRECTORY" ]; then 
 	echo "Directory Exists";
 else
 	echo "Creating Bundle Directory";
-	mkdir bundle
+	mkdir ~/.vim/bundle
 fi
 
 GITHEADER="https://github.com/"
 GITFOOTER=".git"
 PLUGINS=($(grep -v "\"Plugin" plugins.vim| grep -w "Plugin" | tr -d \' | cut -b 1-7 --complement))
-cd bundle
+cd ~/.vim/bundle
 echo "Cloning Plugins..."
 for PLUGIN in "${PLUGINS[@]}"; do
 	echo "$GITHEADER$PLUGIN$GITFOOTER"
