@@ -1,0 +1,12 @@
+#!/bin/bash
+# downloads all vim plugins into the bundle folder
+
+echo "Updating Vim"
+
+sudo add-apt-repository ppa:jonathonf/vim
+
+sudo apt update
+
+sudo apt install vim
+
+vim --version
