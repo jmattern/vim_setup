@@ -17,8 +17,7 @@ set bg=dark
 if v:version > 800
 	"Use Ale if vim version is 8.0 or above
 	let g:ale_enabled = 1
-	let g:ale_lint_on_enter = 1
-	let g:ale_linters = {'python': ['flake8', 'pylint']}
+	let g:ale_linters = {'python': ['flake8', 'sandboxpylint']}
 	let g:ale_fixers = ['autopep8']
 else
 	"Otherwise use Autopep8

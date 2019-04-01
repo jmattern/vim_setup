@@ -10,7 +10,6 @@ call ale#Set('python_pylint_auto_pipenv', 0)
 function! ale_linters#python#pylint#GetCommand(buffer) abort
     let l:local_path = expand('#' . a:buffer . ':p')
     let l:remote_path =  substitute(l:local_path, '^.*shining_software/src/shining_software/','/opt/shining_software/shining_software/', '')
-    echo l:remote_path
 
     return 'sshpass -p brain ssh brain@sandbox'
     \   . ' "source /opt/shining_software/use_repo.sh; pylint --rcfile=/opt/shining_software/pylint_rc --jobs=1 --load-plugins=shining_software.py2to3_fixers.import_builder --disable=all --enable=imports-analysis'
