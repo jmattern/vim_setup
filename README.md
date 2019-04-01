@@ -1,2 +1,2 @@
 # vim_setup
-setup files for current vim configuration.  Just clone the repository and place all files in the home directory.  Then run download_plugins to clone all the necessary Vundle plugins.  Then open a vim session and run :PluginInstall.
+Setup files for current vim configuration.  For automatic installation, clone the repository, navigate to the scripts folder, and run unpack_setup.sh.  For manual installation, clone the repository and place all files in the home directory.  Then run download_plugins.sh and update_vim.sh to clone all the necessary Vundle plugins and update vim to be compatable with Ale.  Then open a vim session and run :PluginInstall.
