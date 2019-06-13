@@ -1,5 +1,7 @@
+filetype off
 so ~/.vim/plugins.vim
 syntax on
+filetype plugin indent on
 
 "Choose Color Scheme
 
@@ -24,6 +26,9 @@ else
 	autocmd FileType python noremap <F8> :call Autopep8()<CR>
 endif
 
+"Comment Flush with Left
+let g:NERDDefaultAlign = 'left'
+
 "Custom Mappings
 map ; :Files<CR>
 map s :Ag 
@@ -35,8 +40,13 @@ map <C-k> :vertical resize +1<CR>
 map <C-l> :vertical resize -1<CR>
 let mapleader = ","
 map \ ,c 
+map <F9> :call ToggleDocTestMode()<CR>
+
+"F5 mapping to run python scripts
+autocmd BufRead *.py nmap <F5> :!python %<CR>
 
 "Editor Configurations
+set nocompatible
 set number
 set statusline+=%F
 set colorcolumn=180
