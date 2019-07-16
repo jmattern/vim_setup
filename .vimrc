@@ -46,7 +46,7 @@ map <F9> :call ToggleDocTestMode()<CR>
 autocmd BufRead *.py nmap <F5> :!python %<CR>
 
 "Editor Configurations
-set nocompatible
+"set nocompatible
 set number
 set statusline+=%F
 set colorcolumn=180
@@ -55,6 +55,14 @@ set mouse=a
 set hlsearch
 set updatetime=100
 let NERDTreeIgnore = ['\.pyc$']
+
+"Turn off whitespace highlighting for python
+if exists('python_highlight_all')
+    unlet python_highlight_all
+endif
+if exists('python_space_error_highlight')
+    unlet python_space_error_highlight
+endif
 
 "only shows file contents in Ag instead of file names
 command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)

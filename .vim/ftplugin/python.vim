@@ -1,6 +1,7 @@
 set expandtab
 set shiftwidth=4
 set softtabstop=4
+let python_space_error_highlight = 0
 
 "Check if sandbox is mounted and corresponds to current project being edited
 "Returns 1 if a corresponding sandbox is running, 0 otherwise

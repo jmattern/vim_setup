@@ -16,3 +16,5 @@ sudo ./update_vim
 ./download_plugins
 scp sandbox_pylint.vim bundle/ale/ale_linters/python/pylint.vim
 scp doclint.vim bundle/ale/ale_linters/python/doclint.vim
+rm sandbox_pylint.vim
+rm doclint.vim
