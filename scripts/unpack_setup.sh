@@ -3,6 +3,7 @@
 cd ..
 scp -r .vim ~/.vim
 scp .vimrc ~/.vimrc
+scp .tmux.conf ~/.tmux.conf
 scp pylint_variations/sandbox_pylint.vim ~/.vim/
 scp pylint_variations/doclint.vim ~/.vim/
 
