@@ -25,7 +25,7 @@ sudo ./update_vim
 # Load linters
 scp sandboxpylint.vim bundle/ale/ale_linters/python/sandboxpylint.vim
 scp doclint.vim bundle/ale/ale_linters/python/doclint.vim
-rm sandbox_pylint.vim
+rm sandboxpylint.vim
 rm doclint.vim
 
 # Compile YouCompleteMe
