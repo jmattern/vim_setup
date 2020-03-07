@@ -45,6 +45,9 @@ map <F9> :call ToggleDocTestMode()<CR>
 "F5 mapping to run python scripts
 autocmd BufRead *.py nmap <F5> :!python %<CR>
 
+"Open quickfix window upon calling Glog
+autocmd QuickFixCmdPost *grep* cwindow
+
 "Editor Configurations
 "set nocompatible
 set number
