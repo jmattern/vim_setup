@@ -5,8 +5,8 @@ cd ..
 scp -r .vim ~/.vim
 scp .vimrc ~/.vimrc
 scp .tmux.conf ~/.tmux.conf
-scp pylint_variations/sandboxpylint.vim ~/.vim/
-scp pylint_variations/doclint.vim ~/.vim/
+# scp pylint_variations/sandboxpylint.vim ~/.vim/
+# scp pylint_variations/doclint.vim ~/.vim/
 scp .config/flake8 ~/.config/
 
 # Install dependencies
@@ -23,12 +23,16 @@ sudo ./update_vim
 ./download_plugins
 
 # Load linters
-scp sandboxpylint.vim bundle/ale/ale_linters/python/sandboxpylint.vim
-scp doclint.vim bundle/ale/ale_linters/python/doclint.vim
-rm sandboxpylint.vim
-rm doclint.vim
+# scp sandboxpylint.vim bundle/ale/ale_linters/python/sandboxpylint.vim
+# scp doclint.vim bundle/ale/ale_linters/python/doclint.vim
+# rm sandboxpylint.vim
+# rm doclint.vim
 
 # Compile YouCompleteMe
+# install gcc 8 to compile
+sudo apt-get install g++-8
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 700 --slave /usr/bin/g++ g++ /usr/bin/g++-7
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
 sudo pip install --upgrade cryptography  # May have to do this 
 sudo apt install build-essential cmake python3-dev
 cd ~/.vim/bundle/YouCompleteMe
