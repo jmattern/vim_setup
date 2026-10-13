@@ -4,12 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 
-for script in "$REPO_DIR/install.sh" "$REPO_DIR"/scripts/*.sh; do
-    bash -n "$script"
-done
-for script in "$REPO_DIR/.vim/download_plugins" "$REPO_DIR/.vim/update_vim"; do
-    bash -n "$script"
-done
+bash "$REPO_DIR/scripts/check_shell_syntax.sh"
 bash "$REPO_DIR/.vim/download_plugins" --help >/dev/null
 if command -v shellcheck >/dev/null 2>&1; then
     shellcheck "$REPO_DIR/install.sh" "$REPO_DIR"/scripts/*.sh "$REPO_DIR/.vim/download_plugins" "$REPO_DIR/.vim/update_vim"

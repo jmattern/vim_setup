@@ -118,3 +118,16 @@ source ./scripts/start_ssh_agent.sh ~/.ssh/id_ed25519
 Checks run offline using temporary directories and headless Vim. They cover
 shell syntax, installation behavior, startup without plugins, and buffer-local
 editor behavior. The same checks run in GitHub Actions.
+
+The standards job also runs the pinned Ruff, ShellCheck, shfmt, markdownlint-cli2,
+and yamllint tools. Install the Python tools from `requirements.txt`, install
+the locked Node tools with `npm ci --prefix .standards/linters`, and install the
+ShellCheck and shfmt versions listed in `TOOLCHAINS.md`. Then run:
+
+```bash
+python3 .standards/tools/standards.py --repo .
+```
+
+This command runs the lint profiles, setup behavior checks, shell syntax checks,
+and formatting checks. It reports unknown ownership and licensing authority as
+warnings until authorized project facts are available.

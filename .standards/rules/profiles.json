@@ -1,0 +1,372 @@
+{
+  "profiles": [
+    {
+      "id": "javascript-typescript",
+      "globs": [
+        "*.js",
+        "*.mjs",
+        "*.cjs",
+        "*.jsx",
+        "*.ts",
+        "*.tsx"
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ],
+      "configs": [
+        ".standards/linters/eslint.config.mjs"
+      ],
+      "commands": [
+        {
+          "id": "eslint",
+          "argv": [
+            "npx",
+            "--prefix",
+            ".standards/linters",
+            "--no-install",
+            "eslint",
+            "--config",
+            ".standards/linters/eslint.config.mjs",
+            "{files}"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "globs": [
+        "*.py"
+      ],
+      "configs": [
+        ".standards/linters/ruff.toml"
+      ],
+      "commands": [
+        {
+          "id": "ruff",
+          "argv": [
+            "ruff",
+            "check",
+            "--config",
+            ".standards/linters/ruff.toml",
+            "{files}"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "go",
+      "globs": [
+        "*.go"
+      ],
+      "configs": [
+        ".standards/linters/.golangci.yml"
+      ],
+      "commands": [
+        {
+          "id": "golangci-lint",
+          "argv": [
+            "golangci-lint",
+            "--config",
+            ".standards/linters/.golangci.yml",
+            "run"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "rust",
+      "globs": [
+        "*.rs"
+      ],
+      "configs": [
+        "Cargo.toml",
+        ".standards/linters/rustfmt.toml"
+      ],
+      "commands": [
+        {
+          "id": "clippy",
+          "argv": [
+            "cargo",
+            "clippy",
+            "--all-targets",
+            "--all-features",
+            "--",
+            "-D",
+            "warnings"
+          ]
+        },
+        {
+          "id": "rustfmt",
+          "argv": [
+            "rustfmt",
+            "--config-path",
+            ".standards/linters/rustfmt.toml",
+            "--check",
+            "{files}"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "java",
+      "globs": [
+        "*.java"
+      ],
+      "configs": [
+        ".standards/linters/checkstyle.xml"
+      ],
+      "commands": [
+        {
+          "id": "checkstyle",
+          "argv": [
+            "checkstyle",
+            "-c",
+            ".standards/linters/checkstyle.xml",
+            "{files}"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "shell",
+      "globs": [
+        "*.sh",
+        "*.bash",
+        ".vim/download_plugins",
+        ".vim/update_vim"
+      ],
+      "configs": [
+        ".standards/linters/.shellcheckrc"
+      ],
+      "commands": [
+        {
+          "id": "shellcheck",
+          "argv": [
+            "shellcheck",
+            "--rcfile=.standards/linters/.shellcheckrc",
+            "{files}"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "markdown",
+      "globs": [
+        "*.md"
+      ],
+      "configs": [
+        ".standards/linters/.markdownlint-cli2.yaml"
+      ],
+      "commands": [
+        {
+          "id": "markdownlint-cli2",
+          "argv": [
+            "npx",
+            "--prefix",
+            ".standards/linters",
+            "--no-install",
+            "markdownlint-cli2",
+            "--config",
+            ".standards/linters/.markdownlint-cli2.yaml",
+            "{files}"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "yaml",
+      "globs": [
+        "*.yml",
+        "*.yaml"
+      ],
+      "configs": [
+        ".standards/linters/.yamllint"
+      ],
+      "commands": [
+        {
+          "id": "yamllint",
+          "argv": [
+            "yamllint",
+            "-c",
+            ".standards/linters/.yamllint",
+            "{files}"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "c-cpp",
+      "globs": [
+        "*.c",
+        "*.h",
+        "*.cc",
+        "*.hh",
+        "*.cpp",
+        "*.hpp",
+        "*.cxx",
+        "*.hxx"
+      ],
+      "configs": [
+        ".standards/linters/.clang-tidy",
+        ".standards/linters/.clang-format"
+      ],
+      "compilation_database": true,
+      "commands": [
+        {
+          "id": "clang-tidy",
+          "argv": [
+            "clang-tidy",
+            "--config-file=.standards/linters/.clang-tidy",
+            "-p",
+            "build",
+            "{files}"
+          ]
+        },
+        {
+          "id": "clang-format",
+          "argv": [
+            "clang-format",
+            "--style=file:.standards/linters/.clang-format",
+            "--dry-run",
+            "--Werror",
+            "{files}"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "csharp",
+      "globs": [
+        "*.cs"
+      ],
+      "configs": [
+        ".editorconfig"
+      ],
+      "commands": [
+        {
+          "id": "dotnet-format",
+          "argv": [
+            "dotnet",
+            "format",
+            "--verify-no-changes"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "swift",
+      "globs": [
+        "*.swift"
+      ],
+      "configs": [
+        ".standards/linters/.swiftlint.yml"
+      ],
+      "commands": [
+        {
+          "id": "swiftlint",
+          "argv": [
+            "swiftlint",
+            "lint",
+            "--config",
+            ".standards/linters/.swiftlint.yml",
+            "--strict"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "kotlin",
+      "globs": [
+        "*.kt",
+        "*.kts"
+      ],
+      "configs": [
+        ".editorconfig"
+      ],
+      "commands": [
+        {
+          "id": "ktlint",
+          "argv": [
+            "ktlint",
+            "{files}"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "ruby",
+      "globs": [
+        "*.rb"
+      ],
+      "configs": [
+        ".standards/linters/.rubocop.yml"
+      ],
+      "commands": [
+        {
+          "id": "rubocop",
+          "argv": [
+            "rubocop",
+            "--config",
+            ".standards/linters/.rubocop.yml",
+            "{files}"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    },
+    {
+      "id": "php",
+      "globs": [
+        "*.php"
+      ],
+      "configs": [
+        ".standards/linters/phpcs.xml"
+      ],
+      "commands": [
+        {
+          "id": "phpcs",
+          "argv": [
+            "phpcs",
+            "--standard=.standards/linters/phpcs.xml",
+            "{files}"
+          ]
+        }
+      ],
+      "exclude_globs": [
+        ".standards/**"
+      ]
+    }
+  ]
+}

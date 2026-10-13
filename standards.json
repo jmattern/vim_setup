@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "checks": {
+    "CS-003": [
+      {
+        "id": "setup-behavior",
+        "argv": ["bash", "scripts/check_setup.sh"]
+      }
+    ],
+    "CS-004": [
+      {
+        "id": "shell-syntax",
+        "argv": ["bash", "scripts/check_shell_syntax.sh"]
+      },
+      {
+        "id": "python-bytecode-compile",
+        "argv": ["python3", "-m", "compileall", "-q", ".standards/tools"]
+      }
+    ],
+    "CS-005": [
+      {
+        "id": "shell-format",
+        "argv": ["shfmt", "-i", "4", "-d", "install.sh", "scripts/check_setup.sh", "scripts/check_shell_syntax.sh", "scripts/install_setup.sh", "scripts/start_ssh_agent.sh", "scripts/unpack_setup.sh", ".vim/download_plugins", ".vim/update_vim"]
+      },
+      {
+        "id": "python-format",
+        "argv": ["ruff", "format", "--check", "--config", ".standards/linters/ruff.toml", ".standards/tools/standards.py"]
+      }
+    ]
+  },
+  "exceptions": []
+}
