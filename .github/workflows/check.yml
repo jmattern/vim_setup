@@ -29,7 +29,7 @@ jobs:
       - name: Install pinned shell tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes shellcheck=0.10.0-1 shfmt=3.6.0-1
+          sudo apt-get install --yes shellcheck shfmt
       - name: Run applicable linters
         run: python3 .standards/tools/standards.py --repo . --lint-only --lint-output lint-results.json
       - uses: actions/upload-artifact@v7.0.1
@@ -62,7 +62,7 @@ jobs:
       - name: Install pinned shell tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes shellcheck=0.10.0-1 shfmt=3.6.0-1
+          sudo apt-get install --yes shellcheck shfmt
       - uses: actions/download-artifact@v8.0.1
         if: always()
         continue-on-error: true
