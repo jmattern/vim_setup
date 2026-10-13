@@ -11,8 +11,9 @@ Run from any directory, using the path to your checkout:
 /path/to/vim_setup/install.sh
 ```
 
-By default, installation links the checkout's Vim, tmux, and flake8 configuration
-into your home directory. Existing targets move to timestamped `.backup.*` paths;
+By default, installation uses `sudo apt-get` to install Git, Vim, ag, fzf, flake8,
+and autopep8, then links the checkout's Vim, tmux, and flake8 configuration into
+your home directory. Existing targets move to timestamped `.backup.*` paths;
 rerunning installation leaves matching links alone. Changes in this checkout
 immediately apply to linked configurations. Keep the checkout in place. Other
 files in `~/.config` are preserved.
@@ -22,18 +23,21 @@ files in `~/.config` are preserved.
 ./install.sh --copy
 
 # Try installation in an isolated directory.
-./install.sh --target-dir /tmp/vim-setup-demo
+./install.sh --skip-system-deps --target-dir /tmp/vim-setup-demo
 
 # Also install plugins (requires network access, Git, and Vim).
 ./install.sh --plugins
 
-# Explicitly install Git and Vim using apt-get and sudo.
-./install.sh --install-system-deps
+# Install only configuration, without system packages or plugin downloads.
+./install.sh --skip-system-deps
 ```
 
-Plain installation uses Bash and standard filesystem tools; it does not install
-packages or contact the network. `scripts/unpack_setup.sh` provides configuration
-installation without the optional dependency/plugin steps.
+Default installation requires Debian/Ubuntu's `apt-get`, sudo, and network access.
+Use `--skip-system-deps` to install configuration on other systems or when tools
+are already installed. With that flag and without `--plugins`, installation runs
+offline using Bash and standard filesystem tools. `scripts/unpack_setup.sh` also
+provides configuration installation without dependency or plugin downloads.
+The `--install-system-deps` flag remains supported for compatibility.
 
 To roll back, move the installed target aside and move its printed backup path
 back to the original location. For example, move `~/.vimrc` to `~/.vimrc.disabled`,
@@ -45,9 +49,16 @@ to restore. Keep any new plugin files you want before restoring a Vim directory.
 The downloader bootstraps Vundle, then lets Vundle evaluate `.vim/plugins.vim`
 and install its plugins. Vim starts without downloaded plugins; plugin commands
 become available after installation.
+Before downloading, it checks for CMake and Python 3 and uses `sudo apt-get` to
+install missing tools (`cmake` and `python3`). An existing `python` command is
+accepted when it runs Python 3. Use `--skip-system-deps` to disable these package
+installs; the required tools must already be available.
 
 ```bash
 ./.vim/download_plugins
+
+# Use existing build tools without installing system packages.
+./.vim/download_plugins --skip-system-deps
 ```
 
 Use `:PluginUpdate` inside Vim to update plugins deliberately. YouCompleteMe also
@@ -61,6 +72,11 @@ Search uses `ag` (the Silver Searcher); fuzzy search requires the `fzf` executab
 Python linting and formatting use `flake8` and `autopep8`. Install Python tools in
 your project environment and activate it before launching Vim; see
 [virtual environment tips](docs/virtual_env_tips.txt).
+
+System dependency installation on Debian/Ubuntu installs
+`silversearcher-ag`, `fzf`, `flake8`, and `python3-autopep8` alongside Git and Vim.
+For project-specific Python tool versions, install `flake8` and `autopep8` in
+the project's virtual environment instead.
 
 ## Keybindings
 

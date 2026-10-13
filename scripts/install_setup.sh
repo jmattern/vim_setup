@@ -6,20 +6,22 @@ REPO_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
 MODE_ARGS=()
 TARGET_DIR=${HOME}
 INSTALL_PLUGINS=false
-INSTALL_SYSTEM_DEPS=false
+INSTALL_SYSTEM_DEPS=true
 
 usage() {
     cat <<EOF
-Usage: ${0##*/} [--copy] [--target-dir DIR] [--plugins] [--install-system-deps]
+Usage: ${0##*/} [--copy] [--target-dir DIR] [--plugins] [--skip-system-deps]
 
 Install dotfiles from this checkout. Symlinks are used by default; existing
-targets are moved to timestamped backups. The default run is local and does
-not contact the network or install system packages.
+targets are moved to timestamped backups. The default run installs system
+dependencies with apt-get and requires sudo. Use --skip-system-deps to opt out.
 
   --copy                 Copy files instead of creating symlinks
   --target-dir DIR       Install into DIR instead of the current user's home
   --plugins              Bootstrap Vundle and install configured Vim plugins
-  --install-system-deps  Install git and Vim with apt-get (requires sudo)
+  --install-system-deps  Install git, Vim, ag, fzf, flake8, and autopep8
+                         with apt-get (default; requires sudo)
+  --skip-system-deps     Skip system package installation
 EOF
 }
 
@@ -34,6 +36,7 @@ while (($#)); do
             ;;
         --plugins) INSTALL_PLUGINS=true ;;
         --install-system-deps) INSTALL_SYSTEM_DEPS=true ;;
+        --skip-system-deps) INSTALL_SYSTEM_DEPS=false ;;
         -h|--help) usage; exit 0 ;;
         *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
     esac
@@ -50,10 +53,10 @@ case "$TARGET_DIR/" in
 esac
 
 if [[ "$INSTALL_SYSTEM_DEPS" == true ]]; then
-    command -v apt-get >/dev/null 2>&1 || { printf '%s\n' 'apt-get is required for --install-system-deps' >&2; exit 1; }
-    command -v sudo >/dev/null 2>&1 || { printf '%s\n' 'sudo is required for --install-system-deps' >&2; exit 1; }
+    command -v apt-get >/dev/null 2>&1 || { printf '%s\n' 'apt-get is required for default system dependency installation; use --skip-system-deps to skip it.' >&2; exit 1; }
+    command -v sudo >/dev/null 2>&1 || { printf '%s\n' 'sudo is required for default system dependency installation; use --skip-system-deps to skip it.' >&2; exit 1; }
     sudo apt-get update
-    sudo apt-get install -y git vim
+    sudo apt-get install -y git vim silversearcher-ag fzf flake8 python3-autopep8
 fi
 
 if [[ "$INSTALL_PLUGINS" == true ]]; then
@@ -64,7 +67,11 @@ fi
 "$SCRIPT_DIR/unpack_setup.sh" "${MODE_ARGS[@]}"
 
 if [[ "$INSTALL_PLUGINS" == true ]]; then
-    "$REPO_DIR/.vim/download_plugins" --target-dir "$TARGET_DIR"
+    DOWNLOAD_ARGS=(--target-dir "$TARGET_DIR")
+    if [[ "$INSTALL_SYSTEM_DEPS" != true ]]; then
+        DOWNLOAD_ARGS+=(--skip-system-deps)
+    fi
+    "$REPO_DIR/.vim/download_plugins" "${DOWNLOAD_ARGS[@]}"
 fi
 
 printf 'Setup installed in %s\n' "$TARGET_DIR"

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 TARGET_DIR=${HOME}
+INSTALL_SYSTEM_DEPS=true
 while (($#)); do
     case "$1" in
         --target-dir)
@@ -9,7 +10,14 @@ while (($#)); do
             (($#)) || { printf '%s\n' '--target-dir requires a directory' >&2; exit 2; }
             TARGET_DIR=$1
             ;;
-        -h|--help) printf 'Usage: %s [--target-dir DIR]\n' "${0##*/}"; exit 0 ;;
+        --skip-system-deps) INSTALL_SYSTEM_DEPS=false ;;
+        --install-system-deps) INSTALL_SYSTEM_DEPS=true ;;
+        -h|--help)
+            printf 'Usage: %s [--target-dir DIR] [--skip-system-deps]\n' "${0##*/}"
+            printf '%s\n' 'Missing cmake or Python 3 dependencies are installed with apt-get by default.'
+            printf '%s\n' 'Use --skip-system-deps to stop with an error when either is missing.'
+            exit 0
+            ;;
         *) printf 'Unknown option: %s\n' "$1" >&2; exit 2 ;;
     esac
     shift
@@ -23,6 +31,37 @@ VUNDLE_DIR=$VIM_HOME/bundle/Vundle.vim
 command -v git >/dev/null 2>&1 || { printf '%s\n' 'git is required to install Vim plugins' >&2; exit 1; }
 command -v vim >/dev/null 2>&1 || { printf '%s\n' 'vim is required to install Vim plugins' >&2; exit 1; }
 [[ -f "$VIMRC" ]] || { printf 'Vim configuration not found: %s (run scripts/unpack_setup.sh first)\n' "$VIMRC" >&2; exit 1; }
+
+find_python3() {
+    local candidate
+    for candidate in python3 python; do
+        if command -v "$candidate" >/dev/null 2>&1 && \
+            "$candidate" -c 'import sys; sys.exit(0 if sys.version_info.major >= 3 else 1)' >/dev/null 2>&1; then
+            printf '%s' "$candidate"
+            return 0
+        fi
+    done
+    return 1
+}
+
+MISSING_PACKAGES=()
+command -v cmake >/dev/null 2>&1 || MISSING_PACKAGES+=(cmake)
+PYTHON3=$(find_python3 || true)
+[[ -n "$PYTHON3" ]] || MISSING_PACKAGES+=(python3)
+
+if ((${#MISSING_PACKAGES[@]})); then
+    if [[ "$INSTALL_SYSTEM_DEPS" != true ]]; then
+        printf 'Missing plugin build dependencies: %s. Install them manually or rerun without --skip-system-deps.\n' "${MISSING_PACKAGES[*]}" >&2
+        exit 1
+    fi
+    command -v apt-get >/dev/null 2>&1 || { printf 'apt-get is required to install missing dependencies: %s\n' "${MISSING_PACKAGES[*]}" >&2; exit 1; }
+    command -v sudo >/dev/null 2>&1 || { printf 'sudo is required to install missing dependencies: %s\n' "${MISSING_PACKAGES[*]}" >&2; exit 1; }
+    sudo apt-get update
+    sudo apt-get install -y "${MISSING_PACKAGES[@]}"
+    command -v cmake >/dev/null 2>&1 || { printf '%s\n' 'cmake is still unavailable after package installation.' >&2; exit 1; }
+    PYTHON3=$(find_python3 || true)
+    [[ -n "$PYTHON3" ]] || { printf '%s\n' 'A usable Python 3 interpreter is still unavailable after package installation.' >&2; exit 1; }
+fi
 
 mkdir -p -- "$VIM_HOME/bundle"
 if [[ -d "$VUNDLE_DIR/.git" ]]; then
