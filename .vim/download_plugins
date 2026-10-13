@@ -1,24 +1,52 @@
-#!/bin/bash
-# downloads all vim plugins into the bundle folder
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "Downloading plugins"
+TARGET_DIR=${HOME}
+while (($#)); do
+    case "$1" in
+        --target-dir)
+            shift
+            (($#)) || { printf '%s\n' '--target-dir requires a directory' >&2; exit 2; }
+            TARGET_DIR=$1
+            ;;
+        -h|--help) printf 'Usage: %s [--target-dir DIR]\n' "${0##*/}"; exit 0 ;;
+        *) printf 'Unknown option: %s\n' "$1" >&2; exit 2 ;;
+    esac
+    shift
+done
+mkdir -p -- "$TARGET_DIR"
+TARGET_DIR=$(cd -- "$TARGET_DIR" && pwd -P)
+VIM_HOME=${TARGET_DIR}/.vim
+VIMRC=${TARGET_DIR}/.vimrc
+VUNDLE_DIR=$VIM_HOME/bundle/Vundle.vim
 
-DIRECTORY=bundle
+command -v git >/dev/null 2>&1 || { printf '%s\n' 'git is required to install Vim plugins' >&2; exit 1; }
+command -v vim >/dev/null 2>&1 || { printf '%s\n' 'vim is required to install Vim plugins' >&2; exit 1; }
+[[ -f "$VIMRC" ]] || { printf 'Vim configuration not found: %s (run scripts/unpack_setup.sh first)\n' "$VIMRC" >&2; exit 1; }
 
-if [ -d "$DIRECTORY" ]; then 
-	echo "Directory Exists";
+mkdir -p -- "$VIM_HOME/bundle"
+if [[ -d "$VUNDLE_DIR/.git" ]]; then
+    printf 'Vundle already exists: %s\n' "$VUNDLE_DIR"
+elif [[ -e "$VUNDLE_DIR" ]]; then
+    printf 'Cannot bootstrap Vundle: path exists and is not a Git checkout: %s\n' "$VUNDLE_DIR" >&2
+    exit 1
 else
-	echo "Creating Bundle Directory";
-	mkdir bundle
+    printf 'Cloning Vundle into %s\n' "$VUNDLE_DIR"
+    git clone https://github.com/VundleVim/Vundle.vim.git "$VUNDLE_DIR"
 fi
 
-GITHEADER="https://github.com/"
-GITFOOTER=".git"
-PLUGINS=($(grep -v "\"Plugin" plugins.vim| grep -w "Plugin" | tr -d \' | cut -b 1-7 --complement))
-cd bundle
-echo "Cloning Plugins..."
-for PLUGIN in "${PLUGINS[@]}"; do
-	echo "$GITHEADER$PLUGIN$GITFOOTER"
-	git clone "$GITHEADER$PLUGIN$GITFOOTER"
+printf 'Installing plugins listed in %s\n' "$VIM_HOME/plugins.vim"
+vim -Nu "$VIMRC" -i NONE -n -es -c 'PluginInstall' -c 'qa!'
+printf '%s\n' 'Plugin installation complete.'
+
+for tool in ag fzf flake8 autopep8; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        case "$tool" in
+            ag) hint='Install The Silver Searcher (the `ag` command) for the Ag mapping.' ;;
+            fzf) hint='Install the fzf executable for the Files mapping.' ;;
+            flake8) hint='Install flake8 in the Python environment used for linting.' ;;
+            autopep8) hint='Install autopep8 in the Python environment used for formatting.' ;;
+        esac
+        printf 'Optional tool missing: %s. %s\n' "$tool" "$hint"
+    fi
 done
-echo "Done!"

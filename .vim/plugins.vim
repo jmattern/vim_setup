@@ -1,7 +1,13 @@
-set rtp+=~/.vim/bundle/Vundle.vim
+let s:vundle = fnamemodify(expand('<sfile>:p'), ':h') . '/bundle/Vundle.vim'
+if !isdirectory(s:vundle)
+    finish
+endif
+execute 'set runtimepath^=' . fnameescape(s:vundle)
+if !filereadable(s:vundle . '/autoload/vundle.vim')
+    finish
+endif
 
-call vundle#begin()
-
+call vundle#begin(fnamemodify(s:vundle, ':h'))
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'editorconfig/editorconfig-vim'
 Plugin 'itchyny/lightline.vim'
@@ -18,18 +24,14 @@ Plugin 'morhetz/gruvbox'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'tpope/vim-fugitive'
-
-"Choose signify or gitgutter
 Plugin 'airblade/vim-gitgutter'
-"Plugin 'mhinz/vim-signify'
 
 if v:version >= 800
-	Plugin 'w0rp/ale'
+    Plugin 'dense-analysis/ale'
 else
-	Plugin 'nvie/vim-flake8'
-	Plugin 'tell-k/vim-autopep8'
+    Plugin 'nvie/vim-flake8'
+    Plugin 'tell-k/vim-autopep8'
 endif
 
 call vundle#end()
-
 filetype plugin indent on

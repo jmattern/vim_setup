@@ -1,71 +1,65 @@
-filetype off
-so ~/.vim/plugins.vim
+set nocompatible
+let mapleader = ','
+let s:config_root = fnamemodify(expand('<sfile>:p'), ':h') . '/.vim'
+let s:after_root = s:config_root . '/after'
+if index(split(&runtimepath, ','), s:config_root) < 0
+    execute 'set runtimepath^=' . fnameescape(s:config_root)
+endif
+if index(split(&runtimepath, ','), s:after_root) < 0
+    execute 'set runtimepath+=' . fnameescape(s:after_root)
+endif
+
+" Load plugins only when Vundle is installed.
+if filereadable(s:config_root . '/plugins.vim')
+    execute 'source ' . fnameescape(s:config_root . '/plugins.vim')
+endif
+
 syntax on
 filetype plugin indent on
 
-"Choose Color Scheme
-
-"colorscheme sublimemonokai
 let g:gruvbox_contrast_dark = 'hard'
-colorscheme gruvbox
-set bg=dark
-
-"If using Signify instead of gitgutter
-"let g:signify_vcs_list = ['git']
-"let g:signify_realtime = 1
-"let g:signify_update_on_bufenter = 1
-"let g:signify_update_on_focusgained = 1
-
-if v:version > 800
-	"Use Ale if vim version is 8.0 or above
-	let g:ale_enabled = 1
-	let g:ale_linters = {'python': ['flake8', 'sandboxpylint']}
-	let g:ale_fixers = ['autopep8']
-else
-	"Otherwise use Autopep8
-	autocmd FileType python noremap <F8> :call Autopep8()<CR>
+if !empty(globpath(&runtimepath, 'colors/gruvbox.vim'))
+    colorscheme gruvbox
 endif
+set background=dark
 
-"Comment Flush with Left
+" Keep Vim's native ., s, and ; motions. Plugin commands use the leader.
+nnoremap <leader>f :Files<CR>
+nnoremap <leader>a :Ag<Space>
+nnoremap <leader>n :NERDTreeToggle<CR>
+nnoremap <C-_> :NERDTreeFind<CR>
+nnoremap <C-h> :resize +1<CR>
+nnoremap <C-j> :resize -1<CR>
+nnoremap <C-k> :vertical resize +1<CR>
+nnoremap <C-l> :vertical resize -1<CR>
+
 let g:NERDDefaultAlign = 'left'
+let NERDTreeIgnore = ['\.pyc$']
 
-"Custom Mappings
-map ; :Files<CR>
-map s :Ag 
-map . :NERDTreeToggle<CR>
-map <C-_> :NERDTreeFind<CR>
-map <C-h> :resize +1<CR>
-map <C-j> :resize -1<CR>
-map <C-k> :vertical resize +1<CR>
-map <C-l> :vertical resize -1<CR>
-let mapleader = ","
-map \ ,c 
-map <F9> :call ToggleDocTestMode()<CR>
+augroup vim_setup_quickfix
+    autocmd!
+    autocmd QuickFixCmdPost *grep* cwindow
+augroup END
 
-"F5 mapping to run python scripts
-autocmd BufRead *.py nmap <F5> :!python %<CR>
 
-"Open quickfix window upon calling Glog
-autocmd QuickFixCmdPost *grep* cwindow
-
-"Editor Configurations
-"set nocompatible
 set number
-set statusline+=%F
+if &statusline !~# '%F'
+    set statusline+=%F
+endif
 set colorcolumn=180
 set nowrap
 set mouse=a
 set hlsearch
 set updatetime=100
-let NERDTreeIgnore = ['\.pyc$']
 
-"Turn off whitespace highlighting for python
-if exists('python_highlight_all')
-    unlet python_highlight_all
-endif
-if exists('python_space_error_highlight')
-    unlet python_space_error_highlight
+if exists('python_highlight_all') | unlet python_highlight_all | endif
+if exists('python_space_error_highlight') | unlet python_space_error_highlight | endif
+
+if v:version >= 800
+    let g:ale_enabled = 1
+    let g:ale_linters = {'python': ['flake8']}
+    let g:ale_fixers = {'python': ['autopep8']}
 endif
 
-"only shows file contents in Ag instead of file names
+" Preserve the convenient Ag wrapper when fzf.vim is available.
 command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)

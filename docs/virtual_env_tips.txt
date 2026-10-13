@@ -1,13 +1,26 @@
-# Install virtual environment
-sudo apt update
-sudo apt install python3-dev python3-pip
-sudo pip3 install -U virtualenv  # system-wide install
+Python virtual environments
+===========================
 
-# Create virtual environment
-virtualenv --system-site-packages -p python3 ./venv
+Install the Python venv support package with your operating system's package
+manager when it is missing. On Debian or Ubuntu:
 
-# Activate virtual environment
-source ./venv/bin/activate
+    sudo apt-get install python3-venv
 
-# Deactivate virtual environment
-deactivate
+Create and activate a project-local environment:
+
+    python3 -m venv .venv
+    source .venv/bin/activate
+
+Install Python tools inside the active environment, without sudo:
+
+    python -m pip install --upgrade pip
+    python -m pip install flake8 autopep8
+
+Deactivate the environment when finished:
+
+    deactivate
+
+Use `--system-site-packages` with `python3 -m venv` only when the project
+needs packages already installed for the system Python. Avoid installing
+project tools with `sudo pip`; that can conflict with packages managed by the
+operating system.

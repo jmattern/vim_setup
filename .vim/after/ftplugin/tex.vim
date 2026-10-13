@@ -1,13 +1,13 @@
 " this is mostly a matter of taste. but LaTeX looks good with just a bit
 " of indentation.
-set sw=2 textwidth=78
+setlocal sw=2 textwidth=78
 
 "Turn on auto-formatting for paragraphs (q stands for equation, t stands for text)
-nnoremap <leader>q :set formatoptions=<CR>
-nnoremap <leader>t :set formatoptions=atcql<CR>
+nnoremap <buffer> <leader>q :setlocal formatoptions=<CR>
+nnoremap <buffer> <leader>t :setlocal formatoptions=atcql<CR>
 
 "Mapping to reformat current paragraph
-noremap R gqap
+nnoremap <buffer> R gqap
 
 " TIP: if you write your \label's as \label{fig:something}, then if you
 " type in \ref{fig: and press <C-n> you will automatically cycle through
@@ -30,10 +30,10 @@ let g:Tex_CompileRule_ps = 'dvips -Ppdf -t letter -o $*.ps $*.dvi'
 "nmap <leader>la <leader>lv && :echo "hello WTF"<CR>
 
 "Turn auto-formatting of long lines off
-set formatoptions+=l
+setlocal formatoptions+=l
 
 "Filter stuck float warning
-let g:Tex_IgnoredWarnings = 
+let g:Tex_IgnoredWarnings =
 \"Underfull\n".
 \"Overfull\n".
 \"specifier changed to\n".
@@ -44,3 +44,9 @@ let g:Tex_IgnoredWarnings =
 \"float is stuck"
 
 let g:Tex_IgnoreLevel = 8
+function! VimSetupTexUndo() abort
+    silent! nunmap <buffer> <leader>q
+    silent! nunmap <buffer> <leader>t
+    silent! nunmap <buffer> R
+endfunction
+let b:undo_ftplugin = get(b:, 'undo_ftplugin', '') . (empty(get(b:, 'undo_ftplugin', '')) ? '' : ' | ') . 'setlocal shiftwidth< textwidth< formatoptions< | call VimSetupTexUndo()'

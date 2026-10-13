@@ -1,12 +1,11 @@
-#!/bin/bash
-# downloads all vim plugins into the bundle folder
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "Updating Vim"
+command -v vim >/dev/null 2>&1 || {
+    printf '%s\n' 'Vim is not installed. Install it with your system package manager or use scripts/install_setup.sh --install-system-deps.' >&2
+    exit 1
+}
 
-sudo add-apt-repository ppa:jonathonf/vim
-
-sudo apt update
-
-sudo apt install vim
-
-vim --version
+printf '%s\n' 'Using the Vim installation already available on this system:'
+vim --version | sed -n '1,2p'
+printf '%s\n' 'No system packages or editor alternatives were changed.'

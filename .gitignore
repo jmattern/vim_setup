@@ -1,0 +1,5 @@
+.vim/bundle/
+*.swp
+*.swo
+*~
+__pycache__/
