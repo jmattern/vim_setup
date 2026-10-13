@@ -2,4 +2,4 @@
 set -euo pipefail
 
 REPO_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-exec "$REPO_DIR/scripts/install_setup.sh" "$@"
+exec "${REPO_DIR}/scripts/install_setup.sh" "$@"

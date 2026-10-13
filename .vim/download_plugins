@@ -5,87 +5,115 @@ TARGET_DIR=${HOME}
 INSTALL_SYSTEM_DEPS=true
 while (($#)); do
     case "$1" in
-        --target-dir)
-            shift
-            (($#)) || { printf '%s\n' '--target-dir requires a directory' >&2; exit 2; }
-            TARGET_DIR=$1
-            ;;
-        --skip-system-deps) INSTALL_SYSTEM_DEPS=false ;;
-        --install-system-deps) INSTALL_SYSTEM_DEPS=true ;;
-        -h|--help)
-            printf 'Usage: %s [--target-dir DIR] [--skip-system-deps]\n' "${0##*/}"
-            printf '%s\n' 'Missing cmake or Python 3 dependencies are installed with apt-get by default.'
-            printf '%s\n' 'Use --skip-system-deps to stop with an error when either is missing.'
-            exit 0
-            ;;
-        *) printf 'Unknown option: %s\n' "$1" >&2; exit 2 ;;
+    --target-dir)
+        shift
+        (($#)) || {
+            printf '%s\n' '--target-dir requires a directory' >&2
+            exit 2
+        }
+        TARGET_DIR=$1
+        ;;
+    --skip-system-deps) INSTALL_SYSTEM_DEPS=false ;;
+    --install-system-deps) INSTALL_SYSTEM_DEPS=true ;;
+    -h | --help)
+        printf 'Usage: %s [--target-dir DIR] [--skip-system-deps]\n' "${0##*/}"
+        printf '%s\n' 'Missing cmake or Python 3 dependencies are installed with apt-get by default.'
+        printf '%s\n' 'Use --skip-system-deps to stop with an error when either is missing.'
+        exit 0
+        ;;
+    *)
+        printf 'Unknown option: %s\n' "$1" >&2
+        exit 2
+        ;;
     esac
     shift
 done
-mkdir -p -- "$TARGET_DIR"
-TARGET_DIR=$(cd -- "$TARGET_DIR" && pwd -P)
+mkdir -p -- "${TARGET_DIR}"
+TARGET_DIR=$(cd -- "${TARGET_DIR}" && pwd -P)
 VIM_HOME=${TARGET_DIR}/.vim
 VIMRC=${TARGET_DIR}/.vimrc
-VUNDLE_DIR=$VIM_HOME/bundle/Vundle.vim
+VUNDLE_DIR=${VIM_HOME}/bundle/Vundle.vim
 
-command -v git >/dev/null 2>&1 || { printf '%s\n' 'git is required to install Vim plugins' >&2; exit 1; }
-command -v vim >/dev/null 2>&1 || { printf '%s\n' 'vim is required to install Vim plugins' >&2; exit 1; }
-[[ -f "$VIMRC" ]] || { printf 'Vim configuration not found: %s (run scripts/unpack_setup.sh first)\n' "$VIMRC" >&2; exit 1; }
+command -v git >/dev/null 2>&1 || {
+    printf '%s\n' 'git is required to install Vim plugins' >&2
+    exit 1
+}
+command -v vim >/dev/null 2>&1 || {
+    printf '%s\n' 'vim is required to install Vim plugins' >&2
+    exit 1
+}
+[[ -f "${VIMRC}" ]] || {
+    printf 'Vim configuration not found: %s (run scripts/unpack_setup.sh first)\n' "${VIMRC}" >&2
+    exit 1
+}
 
 find_python3() {
     local candidate
     for candidate in python3 python; do
-        if command -v "$candidate" >/dev/null 2>&1 && \
-            "$candidate" -c 'import sys; sys.exit(0 if sys.version_info.major >= 3 else 1)' >/dev/null 2>&1; then
-            printf '%s' "$candidate"
+        if command -v "${candidate}" >/dev/null 2>&1 &&
+            "${candidate}" -c 'import sys; sys.exit(0 if sys.version_info.major >= 3 else 1)' >/dev/null 2>&1; then
+            printf '%s' "${candidate}"
             return 0
         fi
     done
-    return 1
+    return 0
 }
 
 MISSING_PACKAGES=()
 command -v cmake >/dev/null 2>&1 || MISSING_PACKAGES+=(cmake)
-PYTHON3=$(find_python3 || true)
-[[ -n "$PYTHON3" ]] || MISSING_PACKAGES+=(python3)
+PYTHON3=$(find_python3)
+[[ -n "${PYTHON3}" ]] || MISSING_PACKAGES+=(python3)
 
 if ((${#MISSING_PACKAGES[@]})); then
-    if [[ "$INSTALL_SYSTEM_DEPS" != true ]]; then
+    if [[ "${INSTALL_SYSTEM_DEPS}" != true ]]; then
         printf 'Missing plugin build dependencies: %s. Install them manually or rerun without --skip-system-deps.\n' "${MISSING_PACKAGES[*]}" >&2
         exit 1
     fi
-    command -v apt-get >/dev/null 2>&1 || { printf 'apt-get is required to install missing dependencies: %s\n' "${MISSING_PACKAGES[*]}" >&2; exit 1; }
-    command -v sudo >/dev/null 2>&1 || { printf 'sudo is required to install missing dependencies: %s\n' "${MISSING_PACKAGES[*]}" >&2; exit 1; }
+    command -v apt-get >/dev/null 2>&1 || {
+        printf 'apt-get is required to install missing dependencies: %s\n' "${MISSING_PACKAGES[*]}" >&2
+        exit 1
+    }
+    command -v sudo >/dev/null 2>&1 || {
+        printf 'sudo is required to install missing dependencies: %s\n' "${MISSING_PACKAGES[*]}" >&2
+        exit 1
+    }
     sudo apt-get update
     sudo apt-get install -y "${MISSING_PACKAGES[@]}"
-    command -v cmake >/dev/null 2>&1 || { printf '%s\n' 'cmake is still unavailable after package installation.' >&2; exit 1; }
-    PYTHON3=$(find_python3 || true)
-    [[ -n "$PYTHON3" ]] || { printf '%s\n' 'A usable Python 3 interpreter is still unavailable after package installation.' >&2; exit 1; }
+    command -v cmake >/dev/null 2>&1 || {
+        printf '%s\n' 'cmake is still unavailable after package installation.' >&2
+        exit 1
+    }
+    PYTHON3=$(find_python3)
+    [[ -n "${PYTHON3}" ]] || {
+        printf '%s\n' 'A usable Python 3 interpreter is still unavailable after package installation.' >&2
+        exit 1
+    }
 fi
 
-mkdir -p -- "$VIM_HOME/bundle"
-if [[ -d "$VUNDLE_DIR/.git" ]]; then
-    printf 'Vundle already exists: %s\n' "$VUNDLE_DIR"
-elif [[ -e "$VUNDLE_DIR" ]]; then
-    printf 'Cannot bootstrap Vundle: path exists and is not a Git checkout: %s\n' "$VUNDLE_DIR" >&2
+mkdir -p -- "${VIM_HOME}/bundle"
+if [[ -d "${VUNDLE_DIR}/.git" ]]; then
+    printf 'Vundle already exists: %s\n' "${VUNDLE_DIR}"
+elif [[ -e "${VUNDLE_DIR}" ]]; then
+    printf 'Cannot bootstrap Vundle: path exists and is not a Git checkout: %s\n' "${VUNDLE_DIR}" >&2
     exit 1
 else
-    printf 'Cloning Vundle into %s\n' "$VUNDLE_DIR"
-    git clone https://github.com/VundleVim/Vundle.vim.git "$VUNDLE_DIR"
+    printf 'Cloning Vundle into %s\n' "${VUNDLE_DIR}"
+    git clone https://github.com/VundleVim/Vundle.vim.git "${VUNDLE_DIR}"
 fi
 
-printf 'Installing plugins listed in %s\n' "$VIM_HOME/plugins.vim"
-vim -Nu "$VIMRC" -i NONE -n -es -c 'PluginInstall' -c 'qa!'
+printf 'Installing plugins listed in %s\n' "${VIM_HOME}/plugins.vim"
+vim -Nu "${VIMRC}" -i NONE -n -es -c 'PluginInstall' -c 'qa!'
 printf '%s\n' 'Plugin installation complete.'
 
 for tool in ag fzf flake8 autopep8; do
-    if ! command -v "$tool" >/dev/null 2>&1; then
-        case "$tool" in
-            ag) hint='Install The Silver Searcher (the `ag` command) for the Ag mapping.' ;;
-            fzf) hint='Install the fzf executable for the Files mapping.' ;;
-            flake8) hint='Install flake8 in the Python environment used for linting.' ;;
-            autopep8) hint='Install autopep8 in the Python environment used for formatting.' ;;
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+        case "${tool}" in
+        ag) hint='Install The Silver Searcher (the ag command) for the Ag mapping.' ;;
+        fzf) hint='Install the fzf executable for the Files mapping.' ;;
+        flake8) hint='Install flake8 in the Python environment used for linting.' ;;
+        autopep8) hint='Install autopep8 in the Python environment used for formatting.' ;;
+        *) hint='No installation hint is available.' ;;
         esac
-        printf 'Optional tool missing: %s. %s\n' "$tool" "$hint"
+        printf 'Optional tool missing: %s. %s\n' "${tool}" "${hint}"
     fi
 done
