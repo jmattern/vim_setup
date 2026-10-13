@@ -1,7 +1,0 @@
-{
-  "name": "vim-setup-linters",
-  "private": true,
-  "devDependencies": {
-    "markdownlint-cli2": "0.17.2"
-  }
-}

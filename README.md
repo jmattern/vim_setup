@@ -111,34 +111,6 @@ source ./scripts/start_ssh_agent.sh ~/.ssh/id_ed25519
 
 ## Check changes
 
-The standards workflow uses the common-standards checkout pinned at
-`1bdfb52e0c72b37c5c2acca5db2e8a87b43f87c5` in a sibling directory. To prepare
-that checkout and the local lint tools:
-
-```bash
-git clone git@github.com:jmattern/common-standards.git ../common-standards
-git -C ../common-standards checkout 1bdfb52e0c72b37c5c2acca5db2e8a87b43f87c5
-python3 -m pip install -r ../common-standards/requirements.txt
-python3 -m pip install yamllint==1.38.0
-npm ci --prefix linters
-```
-
-Install ShellCheck 0.9.0 and shfmt 3.8.0 with your system package manager.
-Run the same lint artifact handoff used by CI, followed by the standards
-checks:
-
-```bash
-python3 ../common-standards/tools/standards.py --repo . --lint-only --lint-output /tmp/vim-setup-lint.json
-shellcheck --rcfile=linters/.shellcheckrc .vim/download_plugins .vim/update_vim
-python3 ../common-standards/tools/standards.py --repo . --lint-report /tmp/vim-setup-lint.json
-```
-
-The lint job runs ShellCheck, Markdown, and YAML linters and uploads their
-result. The always-run standards job consumes that result and runs the setup
-checks, Vim startup validation, and shell formatting check. CS-007 remains
-failing while optional Vundle plugin revisions are mutable; see
-`DEPENDENCIES.md`.
-
 ```bash
 ./scripts/check_setup.sh
 ```

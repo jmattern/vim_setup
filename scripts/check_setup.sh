@@ -11,10 +11,8 @@ for script in "$REPO_DIR/.vim/download_plugins" "$REPO_DIR/.vim/update_vim"; do
     bash -n "$script"
 done
 bash "$REPO_DIR/.vim/download_plugins" --help >/dev/null
-if [[ "${VIM_SETUP_SKIP_SHELLCHECK:-false}" != true ]] && command -v shellcheck >/dev/null 2>&1; then
-    shellcheck --rcfile="$REPO_DIR/linters/.shellcheckrc" \
-        "$REPO_DIR/install.sh" "$REPO_DIR"/scripts/*.sh \
-        "$REPO_DIR/.vim/download_plugins" "$REPO_DIR/.vim/update_vim"
+if command -v shellcheck >/dev/null 2>&1; then
+    shellcheck "$REPO_DIR/install.sh" "$REPO_DIR"/scripts/*.sh "$REPO_DIR/.vim/download_plugins" "$REPO_DIR/.vim/update_vim"
 fi
 
 command -v vim >/dev/null 2>&1 || {
